@@ -33,10 +33,14 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Insert normalization script into HTML files
+        run: |
+          find . -maxdepth 1 -name "*.html" -not -name "google*.html" -exec sed -i '/<head>/a \  <script>if(window.location.hostname.endsWith(".")){window.location.replace(window.location.href.replace(window.location.hostname,window.location.hostname.slice(0,-1)));}</script>' {} +
+        shell: bash
       - name: Remove sensitive files from deployment artifact
         run: |
-          # デプロイ対象削除 
-          rm -f README.md README readme.md license LICENSE LICENSE.txt
+          rm -f README.md README readme.md license LICENSE LICENSE.txt _redirects.md _redirects
+        shell: bash
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
