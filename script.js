@@ -19,6 +19,7 @@ const endpoints = [
 let offset = 0;
 let synced = false;
 let lastSync = 0;
+const syncInterval = 5 * 60 * 1000;
 
 async function syncTime() {
     for (const endpoint of endpoints) {
@@ -101,6 +102,16 @@ function nowTime() {
     return new Date(timestamp);
 }
 
+function scheduleSync() {
+    const now = nowTime().getTime();
+    const delay = syncInterval - (now % syncInterval);
+
+    setTimeout(() => {
+        scheduleSync();
+        syncTime();
+    }, delay);
+}
+
 function layout() {
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -139,7 +150,5 @@ function tick() {
 window.addEventListener('resize', layout);
 
 layout();
-syncTime();
-
-setInterval(syncTime, 600000);
+syncTime().then(() => scheduleSync());
 requestAnimationFrame(tick);
